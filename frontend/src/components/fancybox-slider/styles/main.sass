@@ -1,0 +1,36 @@
+.fancybox
+    position: relative
+
+    .fancybox__navigation
+
+        .fancybox-button
+            background: transparent
+            border: 0
+            outline: none
+            padding: 10px
+
+        .fancybox-button__arrow_right
+            position: absolute
+            top: calc(50% - 50px)
+            right: 0
+
+        .fancybox-button__arrow_left
+            position: absolute
+            top: calc(50% - 50px)
+            left: 0
+            transform: scale(-1, 1)
+
+    .fancybox-content
+        height: 509px
+
+
+        .fancybox-image
+            position: absolute
+            top: 50%
+            left: 50%
+            transform: translate(-50%, -50%)
+            object-fit: cover
+            width: 550px
+            height: 350px
+
+    
