@@ -15,6 +15,7 @@ from pytorch_lightning.metrics.functional import accuracy, f1, auroc
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
 from pytorch_lightning.loggers import TensorBoardLogger
 
+
 class TestDatasetViT(Dataset):
     def __init__(self, data_path, imgs, feature_extractor=None):
         self.data_path = data_path
@@ -35,20 +36,20 @@ class TestDatasetViT(Dataset):
         img = np.float32(img) / 255
 
         return img
-    
+
     def _load_train_image_for_extractor(self, fn):
         img = cv.imread(filename=os.path.join(self.data_path, fn))
         img = cv.resize(img, (self.W, self.H), interpolation=cv.INTER_AREA)
         return img
-    
+
     def __getitem__(self, idx):
+        image_name = self.imgs[idx]
         image = self._load_train_image_for_extractor(self.imgs[idx])
         inpt = self.feature_extractor(images=image, return_tensors="pt")
         channels = 3
         pixel_values = inpt['pixel_values'].view(3, self.feature_extractor.size, self.feature_extractor.size)
         image = self._load_train_image(self.imgs[idx])
-        sample = torch.tensor(image).type(torch.float), pixel_values
-        
+        sample = image_name, torch.tensor(image).type(torch.float), pixel_values
         return sample
     
 class CollarTagger(pl.LightningModule):
@@ -201,14 +202,16 @@ def collar_classification(test_path, Path_2_model="/Users/egor/Desktop/Хак/mo
     # load weights
     model.load_state_dict(torch.load(Path_2_model))
     model.eval()
-    
-    #prediction
+
+    # prediction
     prediction = []
-    for imgs, features in test_loader:
+    names = []
+    for img_name, imgs, features in test_loader:
+        names.extend(img_name)
         _, outputs = model(imgs, features, None)
-        preds = [1 if x > 0.0 else 0 for x in outputs]
+        preds = ['false' if x > 0.0 else 'true' for x in outputs]
         prediction.extend(preds)
 
-    return prediction
+    return dict(zip(names, prediction))
 
 collar_classification("/Users/egor/Desktop/Хак/Augmented_v4/test")
