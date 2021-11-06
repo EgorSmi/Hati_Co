@@ -13,9 +13,9 @@ from django.core.files.base import ContentFile
 
 
 def geo_addition1(data):
-    path_2_dvn = '../../cam_data/data-8180-2021-08-18.json'
-    path_2_pvn = '../../cam_data/data-49169-2021-08-12.json'
-    path_2_mmc = '../../cam_data/data-8174-2021-08-10.json'  # можно не использовать, но там немного камер
+    path_2_dvn = 'cam_data/data-8180-2021-08-18.json'
+    path_2_pvn = 'cam_data/data-49169-2021-08-12.json'
+    path_2_mmc = 'cam_data/data-8174-2021-08-10.json'
     with open(path_2_dvn, 'rt', encoding='cp1251') as file:
         dvn = json.load(file)
 
@@ -27,7 +27,7 @@ def geo_addition1(data):
 
     reestr = pvn + dvn + mmc
 
-    cam_id = id
+    cam_id = data
     true_coord = []
     for real in reestr:
         if cam_id == real["ID"]:
@@ -76,22 +76,31 @@ def data_filter(preds, odata):
                 continue
         if odata['tail'] != 'undefined' and preds[pr[1]]['tail'] != odata['tail']:
             continue
-        if odata['animal'] != 'undefined' and not preds[pr[1]]['isitadog']:
+        if odata['animal'] != 'undefined' and ((preds[pr[1]]['isanimalthere'] and odata['animal'] == 'false') or (
+                not preds[pr[1]]['isanimalthere'] and odata['animal'] == 'true')):
+            continue
+        if odata['isitadog'] != 'undefined' and ((preds[pr[1]]['isitadog'] and odata['isitadog'] == 'false') or (
+                not preds[pr[1]]['isitadog'] and odata['isitadog'] == 'true')):
+            continue
+        if odata['withowner'] != 'undefined' and ((preds[pr[1]]['withowner'] and odata['withowner'] == 'false') or (
+                not preds[pr[1]]['withowner'] and odata['withowner'] == 'true')):
             continue
         if odata['breed'] != 'undefined' and preds[pr[1]]['breed'] != odata['breed']:
             continue
         if odata['color'] != 'undefined' and preds[pr[1]]['color'] != odata['color']:
             continue
-        if odata['marks'] !='undefined' and preds[pr[1]]['marks'] != odata['marks']:
+        if odata['markers'] != 'undefined' and preds[pr[1]]['markers'] != odata['markers']:
             continue
-        
+
         file_tst = str(settings.BASE_DIR) + '/media/dogs/' + pr[1]
         if os.path.exists(file_tst):
-            data.append({'id': pr[0], 'image': 'http://84.201.148.17:26555/media/dogs/' + pr[1], 'address' : preds[pr[1]]['address']})
+            data.append({'id': pr[0], 'image': 'http://84.201.148.17:26555/media/dogs/' + pr[1],
+                         'address': preds[pr[1]]['address']})
         else:
             file_user = str(settings.BASE_DIR) + '/media/hati/' + pr[1]
             if os.path.exists(file_user):
-                data.append({'id': pr[0], 'image': 'http://84.201.148.17:26555/media/hati/' + pr[1], 'address' : preds[pr[1]]['address']})
+                data.append({'id': pr[0], 'image': 'http://84.201.148.17:26555/media/hati/' + pr[1],
+                             'address': preds[pr[1]]['address']})
 
     return data
 

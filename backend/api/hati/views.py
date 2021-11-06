@@ -9,7 +9,6 @@ from .serializers import HatiMetaSerializer
 from .service import data_processing, data_filter, get_testdata
 
 
-
 class HatiMetaView(GenericAPIView):
     """
     Получить мета информацию связанную с объявлениями для поиска собак
@@ -55,43 +54,46 @@ class HatiFindView(GenericAPIView):
         odata = {'camera': self.request.data.get('camera'), 'animal': self.request.data.get('animal'),
                  'tail': self.request.data.get('tail'), 'color': self.request.data.get('color'),
                  'radius': self.request.data.get('radius'), 'breed': self.request.data.get('breed'),
-                 'marks': self.request.data.get('marks')}
-
+                 'markers': self.request.data.get('markers'), 'isitadog': self.request.data.get('isitadog'),
+                 'withowner': self.request.data.get('withowner'), }
 
         odata['camera'] = odata['camera'] if odata['camera'] else 'undefined'
 
-        id = self.request.data.get('id')
         is_testdata = self.request.data.get('is_testdata')
 
         if is_testdata == "true":
             obj_data = get_testdata()
-            pass
         else:
-            obj_data = HatiInfo.objects.get(id=id).info
+            files = []
+            for file in self.request.data:
+                if str(file).startswith('image_'):
+                    files.append(self.request.data.get(str(file)))
+
+            obj_data = data_processing(files)
 
         data = data_filter(obj_data, odata)
 
-        return Response({"images":data}, status=status.HTTP_200_OK)
+        return Response({"images": data}, status=status.HTTP_200_OK)
 
 
-class UploadPhotoView(GenericAPIView):
-    """
-    Сохранение изображений собаки и её поиск
-    """
+# class UploadPhotoView(GenericAPIView):
+#     """
+#     Сохранение изображений собаки и её поиск
+#     """
 
-    def post(self, request, *args, **kwargs):
-        files = []
-        for file in self.request.data:
-            if str(file).startswith('image_'):
-                files.append(self.request.data.get(str(file)))
+#     def post(self, request, *args, **kwargs):
+#         files = []
+#         for file in self.request.data:
+#             if str(file).startswith('image_'):
+#                 files.append(self.request.data.get(str(file)))
 
-        data = data_processing(files)
+#         data = data_processing(files)
 
-        info = {}
+#         info = {}
 
-        if data:
-            obj = HatiInfo.objects.create(info = {"hi"})
-            obj.save()
-            info = {'id':obj.id}
+#         if data:
+#             obj = HatiInfo.objects.create(info=data)
+#             obj.save()
+#             info = {'id': obj.id}
 
-        return Response(info, status=status.HTTP_200_OK)
+#         return Response(info, status=status.HTTP_200_OK)
