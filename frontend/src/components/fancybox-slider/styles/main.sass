@@ -1,0 +1,43 @@
+.fancybox
+    position: relative
+
+    .fancybox__navigation
+
+        .fancybox-button
+            background: transparent
+            border: 0
+            outline: none
+            padding: 10px
+
+        .fancybox-button__arrow_right
+            position: absolute
+            top: calc(50% - 50px)
+            right: 0
+
+        .fancybox-button__arrow_left
+            position: absolute
+            top: calc(50% - 50px)
+            left: 0
+            transform: scale(-1, 1)
+
+        svg
+            transition: .4s
+
+            &:hover
+                color: #b6fff1
+
+
+    .fancybox-content
+        height: 73vh
+
+        .fancybox-image
+            position: absolute
+            top: 50%
+            left: 50%
+            transform: translate(-50%, -50%)
+            object-fit: contain
+            width: 80%
+            height: 90%
+            cursor: pointer
+
+    
