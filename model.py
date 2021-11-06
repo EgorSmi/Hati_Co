@@ -454,10 +454,15 @@ def run_model(linux=True, back=True, yandex=False):
                         pytesseract.image_to_string(img, config=custom_config_ru).split('\n')[0])
 
     # запускаем три отдельных классификатора на базе EfficentNet и один ViT для определения цвета, породы, длины хвоста и ошейника/намордника/одежды
-    breeds = classificator('./temp_data/yolo_crops10/dog/', './weights/model_breeds/', breeds_model)
-    colors = classificator('./temp_data/yolo_crops10/dog/', './weights/model_colors/', colors_model)
-    tails = classificator('./temp_data/yolo_crops10/dog/', './weights/model_tails/', tails_model)
-    attrs = collar_classification('./temp_data/yolo_crops10/dog/', attr_model)
+    breeds = {}
+    colors = {}
+    tails = {}
+    attrs = {}
+    if os.path.exists('./temp_data/yolo_crops10/dog/'):
+        breeds = classificator('./temp_data/yolo_crops10/dog/', './weights/model_breeds/', breeds_model)
+        colors = classificator('./temp_data/yolo_crops10/dog/', './weights/model_colors/', colors_model)
+        tails = classificator('./temp_data/yolo_crops10/dog/', './weights/model_tails/', tails_model)
+        attrs = collar_classification('./temp_data/yolo_crops10/dog/', attr_model)
 
     # убираем нижние подчёркивания из названий камер
     camkeys = list(cams.keys())
